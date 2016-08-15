@@ -5,7 +5,6 @@
 
 ![](http://7xprgn.com1.z0.glb.clouddn.com/Screenshot_20160815-135828.png)
 
-动图如下：  
 
 ![](http://7xprgn.com1.z0.glb.clouddn.com/2016-08-15%2013_53_35.gif)
 
