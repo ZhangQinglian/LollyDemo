@@ -1,7 +1,7 @@
 
 
 # Lolly
-A new way to debug app with log in real time.
+A new way to observe android app log in real time.
 
 ![](http://7xprgn.com1.z0.glb.clouddn.com/Screenshot_20160815-135828.png)
 
