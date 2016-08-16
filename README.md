@@ -5,7 +5,6 @@ A new way to observe android app log in real time.
 
 ![](http://7xprgn.com1.z0.glb.clouddn.com/Screenshot_20160815-135828.png)
 
-![](http://7xprgn.com1.z0.glb.clouddn.com/2016-08-15%2013_53_35.gif)
 # How to include  
 
 Add the library to your module **build.gradle**:
