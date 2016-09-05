@@ -3,7 +3,7 @@
 # Lolly
 A new way to observe android app log in real time.
 
-![](http://7xprgn.com1.z0.glb.clouddn.com/asfasdf.png)
+![](http://upload-images.jianshu.io/upload_images/2702499-689a9034c58afe80.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 # How to include  
 
