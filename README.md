@@ -61,6 +61,7 @@ public static void saveLog(@NotNull android.app.Activity activity)
 # Lolly 1.2
 ## show or hide Lolly with TileService
 ![](http://7xprgn.com1.z0.glb.clouddn.com/tile.gif)
+[see it in youtube](https://youtu.be/kAdJkzRIvAs)
 
 Defind a class with inherit `LollyTile` and override the method `getTags()`
 
