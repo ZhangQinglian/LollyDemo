@@ -11,7 +11,7 @@ Add the library to your module **build.gradle**:
 
 ```gradle
 dependencies {
-    compile 'com.zql.android:lolly:1.1'
+    compile 'com.zql.android:lolly:1.2'
 }
 ```
 
@@ -57,6 +57,36 @@ public static void hideLolly(@NotNull android.app.Activity activity)
 
 public static void saveLog(@NotNull android.app.Activity activity)
 ```
+
+# Lolly 1.2
+## show or hide Lolly with TileService
+![](http://7xprgn.com1.z0.glb.clouddn.com/tile.gif)
+
+Defind a class with inherit `LollyTile` and override the method `getTags()`
+
+```java
+public class MyTileService extends LollyTile {
+    @Override
+    public String[] getTags() {
+        return new String[]{"scott","lolly"};
+    }
+}
+```
+
+register you class in AndroidManifest.xml
+
+```xml
+<service android:name=".MyTileService"
+    android:label="Lolly"
+    android:icon="@mipmap/ic_launcher"
+    android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" >
+    <intent-filter>
+        <action android:name="android.service.quicksettings.action.QS_TILE" />
+    </intent-filter>
+</service>
+```
+
+**😆 Have fun with this function!**
 #License
 
      Copyright 2016 zhangqinglian
