@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">LollyDemo</string>
     <string name="action_settings">Settings</string>
+
+    <array name="lolly_tag">
+        <item>scott</item>
+        <item>lolly</item>
+    </array>
 </resources>
