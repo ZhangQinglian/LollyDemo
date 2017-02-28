@@ -11,7 +11,7 @@ Add the library to your module **build.gradle**:
 
 ```gradle
 dependencies {
-    compile 'com.zql.android:lolly:1.2'
+    compile 'com.zql.android:lolly:1.2.1'
 }
 ```
 
@@ -88,6 +88,10 @@ register you class in AndroidManifest.xml
 ```
 
 **😆 Have fun with this function!**
+
+## example
+
+![](http://7xprgn.com1.z0.glb.clouddn.com/48fb901c8720d435cd852fcaf7695a85.png)
 #License
 
      Copyright 2016 zhangqinglian
