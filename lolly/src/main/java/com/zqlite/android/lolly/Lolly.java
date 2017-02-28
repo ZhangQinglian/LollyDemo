@@ -335,19 +335,22 @@ public class Lolly extends Service {
     }
 
 
+    private boolean saveF = false;
     private void saveLog() {
 
         Logly.i("saveLog");
+        if(saveF) return ;
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
+                saveF = true;
                 List<String> logs = mLogAdapter.getAllLog();
                 File sdcard = Environment.getExternalStorageDirectory();
                 File lolly = new File(sdcard, "/lolly");
                 if (!lolly.exists()) {
                     lolly.mkdir();
                 }
-                SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd-HH:mm:ss");
+                SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd-HH:mm:ss:SSS");
                 String time = sdf.format(Calendar.getInstance().getTime());
                 File logTxt = new File(lolly, "/lolly-log-" + time + ".txt");
                 Logly.i("log Path = " + logTxt.getAbsolutePath());
@@ -355,8 +358,8 @@ public class Lolly extends Service {
                     FileOutputStream fos = new FileOutputStream(logTxt);
                     OutputStreamWriter osw = new OutputStreamWriter(fos);
                     BufferedWriter bw = new BufferedWriter(osw);
-                    for (String line : logs) {
-                        bw.write(line + "\n");
+                    for (int i = 0;i<logs.size();i++) {
+                        bw.write(logs.get(i) + "\n");
                     }
                     bw.close();
                     osw.close();
@@ -366,6 +369,8 @@ public class Lolly extends Service {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                }finally {
+                    saveF = false;
                 }
             }
         });

@@ -28,5 +28,6 @@ dependencies {
     compile 'com.android.support:design:24.+'
     compile 'com.zql.android:logly:1.1'
     compile 'com.zql.android:onepiece:1.0'
-    compile 'com.zql.android:lolly:1.2'
+    //compile 'com.zql.android:lolly:1.2'
+    compile project(':lolly')
 }

@@ -27,7 +27,7 @@ dependencies {
 
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
-version = "1.2"
+version = "1.2.1"
 
 def siteUrl = 'https://github.com/ZhangQinglian/LollyDemo'// project homepage
 def gitUrl = 'https://github.com/ZhangQinglian/LollyDemo.git'// project git
