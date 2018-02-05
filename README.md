@@ -34,16 +34,17 @@ permissions
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 ```
+> you should request above runtime permissions by yourself
 
 java api
 
 ```java
-public static void showLolly(android.app.Activity activity,
+public static void Lolly.showLolly(android.app.Activity activity,
                              java.lang.String[] tags)
 
-public static void hideLolly(@NotNull android.app.Activity activity)
+public static void Lolly.hideLolly(@NotNull android.app.Activity activity)
 
-public static void saveLog(@NotNull android.app.Activity activity)
+public static void Lolly.saveLog(@NotNull android.app.Activity activity)
 ```
 
 
