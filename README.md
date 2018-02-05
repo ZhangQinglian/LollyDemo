@@ -11,7 +11,7 @@ Add the library to your module **build.gradle**:
 
 ```gradle
 dependencies {
-    compile 'com.zql.android:lolly:2.0'
+    implementation 'com.zql.android:lolly:2.0'
 }
 ```
 
