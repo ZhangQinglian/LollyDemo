@@ -40,12 +40,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                     if (Settings.canDrawOverlays(MainActivity.this)) {
-                        Lolly.showLolly(MainActivity.this, new String[]{"scott"});
+                        Lolly.Companion.showLolly(MainActivity.this, new String[]{"scott"});
                     }else{
                         artpHelper.tryToDropZone(MainActivity.this);
                     }
                 }else{
-                    Lolly.showLolly(MainActivity.this, new String[]{"scott"});
+                    Lolly.Companion.showLolly(MainActivity.this, new String[]{"scott"});
                 }
 
             }
@@ -54,14 +54,14 @@ public class MainActivity extends AppCompatActivity {
         mHideWindowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Lolly.hideLolly(MainActivity.this);
+                Lolly.Companion.hideLolly(MainActivity.this);
             }
         });
 
         mSaveLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Lolly.saveLog(MainActivity.this);
+                Lolly.Companion.saveLog(MainActivity.this);
             }
         });
 

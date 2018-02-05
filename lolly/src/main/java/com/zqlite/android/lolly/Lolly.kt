@@ -17,7 +17,6 @@
 
 package com.zqlite.android.lolly
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Service
 import android.content.Context
@@ -26,9 +25,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.os.AsyncTask
-import android.os.Environment
-import android.os.IBinder
+import android.os.*
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.SpannableStringBuilder
@@ -44,11 +41,9 @@ import android.view.WindowManager
 import android.widget.AbsListView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.LinearLayout
-import android.widget.ListView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -63,9 +58,9 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
+import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
-import java.util.ArrayList
-import java.util.Calendar
+import java.util.*
 import java.util.concurrent.Executors
 
 /**
@@ -75,7 +70,7 @@ class Lolly : Service() {
 
     private var mWM: WindowManager? = null
     private var mDisplayMetrics: DisplayMetrics? = null
-    private var mWMLayoutPatams: WindowManager.LayoutParams? = null
+    private var mWMLayoutParams: WindowManager.LayoutParams? = null
     private var mLolly: LinearLayout? = null
     private var mContainer: RecyclerView? = null
     private var mBack2EndCheckBox: CheckBox? = null
@@ -89,10 +84,9 @@ class Lolly : Service() {
 
 
     private var mScroll2End = true
-    private val mCollect = true
     private var mLogAdapter: RVLogAdapter? = null
     private var mTags: MutableList<String>? = null
-
+    private var mHandler = WeakHandler(this)
 
     private var saveF = false
 
@@ -111,16 +105,16 @@ class Lolly : Service() {
         mWM = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         mDisplayMetrics = DisplayMetrics()
         mWM!!.defaultDisplay.getMetrics(mDisplayMetrics)
-        mWMLayoutPatams = WindowManager.LayoutParams()
-        mWMLayoutPatams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        mWMLayoutPatams!!.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR
-        mWMLayoutPatams!!.format = PixelFormat.TRANSLUCENT
-        mWMLayoutPatams!!.gravity = Gravity.START or Gravity.TOP
-        mWMLayoutPatams!!.x = 0
-        mWMLayoutPatams!!.y = 0
-        mWMLayoutPatams!!.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-        mWMLayoutPatams!!.width = WindowManager.LayoutParams.MATCH_PARENT
-        mWMLayoutPatams!!.height = WindowManager.LayoutParams.WRAP_CONTENT
+        mWMLayoutParams = WindowManager.LayoutParams()
+        mWMLayoutParams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        mWMLayoutParams!!.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR
+        mWMLayoutParams!!.format = PixelFormat.TRANSLUCENT
+        mWMLayoutParams!!.gravity = Gravity.START or Gravity.TOP
+        mWMLayoutParams!!.x = 0
+        mWMLayoutParams!!.y = 0
+        mWMLayoutParams!!.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        mWMLayoutParams!!.width = WindowManager.LayoutParams.MATCH_PARENT
+        mWMLayoutParams!!.height = WindowManager.LayoutParams.WRAP_CONTENT
 
         //init the log container
         initLolly()
@@ -129,7 +123,8 @@ class Lolly : Service() {
             mScroll2End = isChecked
             if (mScroll2End) {
                 mBack2EndCheckBox!!.text = "O"
-                mContainer?.scrollToPosition(mLogAdapter!!.itemCount)
+                var position = mLogAdapter!!.itemCount
+                mContainer!!.smoothScrollToPosition(position)
             } else {
                 mBack2EndCheckBox!!.text = "X"
             }
@@ -137,7 +132,7 @@ class Lolly : Service() {
 
         mTerminalBar!!.setOnTouchListener(object : View.OnTouchListener {
 
-            private val originY = mWMLayoutPatams!!.y
+            private val originY = mWMLayoutParams!!.y
             private var deltaY: Int = 0
 
             override fun onTouch(v: View, event: MotionEvent): Boolean {
@@ -148,8 +143,8 @@ class Lolly : Service() {
                     MotionEvent.ACTION_MOVE -> {
                         deltaY = (event.rawY - originY).toInt()
                         if (Math.abs(deltaY) > 5.0f) {
-                            mWMLayoutPatams!!.y = originY + deltaY - 90
-                            mWM!!.updateViewLayout(mLolly, mWMLayoutPatams)
+                            mWMLayoutParams!!.y = originY + deltaY - 90
+                            mWM!!.updateViewLayout(mLolly, mWMLayoutParams)
                         }
                     }
                 }
@@ -158,13 +153,13 @@ class Lolly : Service() {
         })
 
         mOrientationBtn!!.setOnClickListener {
-            if (mWMLayoutPatams!!.screenOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-                mWMLayoutPatams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                mWM!!.updateViewLayout(mLolly, mWMLayoutPatams)
+            if (mWMLayoutParams!!.screenOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                mWMLayoutParams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                mWM!!.updateViewLayout(mLolly, mWMLayoutParams)
                 mOrientationBtn!!.text = "V"
             } else {
-                mWMLayoutPatams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                mWM!!.updateViewLayout(mLolly, mWMLayoutPatams)
+                mWMLayoutParams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                mWM!!.updateViewLayout(mLolly, mWMLayoutParams)
                 mOrientationBtn!!.text = "H"
             }
         }
@@ -185,7 +180,18 @@ class Lolly : Service() {
         Toast.makeText(this, "init Lolly", Toast.LENGTH_LONG).show()
     }
 
+    private fun cleanList(){
+        mLogAdapter?.cleanUp()
+    }
 
+    private fun addOneLineLog(line:String){
+        if (mLogAdapter!!.addOneLog(line)) {
+            if (mScroll2End) {
+                var position = mLogAdapter!!.itemCount
+                mContainer!!.smoothScrollToPosition(position)
+            }
+        }
+    }
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
         when (intent.getIntExtra("action", -1)) {
@@ -194,7 +200,7 @@ class Lolly : Service() {
                 //get window orientation
                 val ori = intent.getIntExtra(LOLLY_ORIENTATION, -233)
                 if (ori != -233) {
-                    mWMLayoutPatams!!.screenOrientation = ori
+                    mWMLayoutParams!!.screenOrientation = ori
                 }
 
                 //get tags from activity
@@ -216,9 +222,9 @@ class Lolly : Service() {
 
                 if (mLolly!!.visibility != View.VISIBLE) {
                     mLolly!!.visibility = View.VISIBLE
-                    mWM!!.addView(mLolly, mWMLayoutPatams)
+                    mWM!!.addView(mLolly, mWMLayoutParams)
                 } else {
-                    mWM!!.updateViewLayout(mLolly, mWMLayoutPatams)
+                    mWM!!.updateViewLayout(mLolly, mWMLayoutParams)
                 }
             }
 
@@ -245,47 +251,69 @@ class Lolly : Service() {
         throw UnsupportedOperationException("Not yet implemented")
     }
 
+
+
+
     private fun showLog() {
-        object : AsyncTask<Void, String, Void>() {
-
-            override fun doInBackground(vararg params: Void): Void? {
-                try {
-                    mLogAdapter!!.cleanUp()
-                    Runtime.getRuntime().exec("logcat -c")
-                    val process = Runtime.getRuntime().exec("logcat -v time")
-                    val `is` = process.inputStream
-                    val reader = InputStreamReader(`is`!!)
-                    val bufferedReader = BufferedReader(
-                            reader)
-
-                    bufferedReader.forEachLine {
-                        if(mCollect){
-                            publishProgress(it)
-                        }
-                    }
-                    bufferedReader?.close()
-                    reader?.close()
-                    `is`?.close()
+        val task = LogCatchTask()
+        task.execute(mHandler)
+    }
 
 
-                } catch (e: IOException) {
+    private class WeakHandler(lolly:Lolly):Handler(){
+
+        private var owner:WeakReference<Lolly>? = WeakReference(lolly)
+
+        override fun handleMessage(msg: Message?) {
+            when(msg!!.what){
+                CLEAN_LIST->{
+                    owner?.get()?.cleanList()
                 }
-
-                return null
-            }
-
-            override fun onProgressUpdate(vararg values: String) {
-                val line = values[0]
-                if (mLogAdapter!!.addOneLog(line)) {
-                    mContainer!!.post {
-                        if (mScroll2End) {
-                            mContainer!!.scrollToPosition(mLogAdapter!!.itemCount)
-                        }
-                    }
+                ADD_ONE_LINE->{
+                    owner?.get()?.addOneLineLog(msg.obj as String)
                 }
             }
-        }.execute()
+        }
 
+        companion object MSG{
+            val CLEAN_LIST = 1
+            val ADD_ONE_LINE = 2
+        }
+    }
+
+    private class LogCatchTask : AsyncTask<Handler,String,Unit>(){
+
+        private var handler:Handler? = null
+        override fun doInBackground(vararg p0: Handler?) {
+
+            try {
+                handler = p0[0]
+                handler?.sendEmptyMessage(WeakHandler.CLEAN_LIST)
+                Runtime.getRuntime().exec("logcat -c")
+                val process = Runtime.getRuntime().exec("logcat -v time")
+                val `is` = process.inputStream
+                val reader = InputStreamReader(`is`!!)
+                val bufferedReader = BufferedReader(
+                        reader)
+
+                bufferedReader.forEachLine {
+                    publishProgress(it)
+                }
+                bufferedReader.close()
+                reader.close()
+                `is`.close()
+
+            } catch (e: IOException) {
+            }
+
+        }
+        override fun onProgressUpdate(vararg values: String) {
+            val line = values[0]
+            val msg = handler!!.obtainMessage()
+            msg.what = WeakHandler.ADD_ONE_LINE
+            msg.obj = line
+            handler!!.sendMessage(msg)
+        }
     }
 
     private fun saveLog() {
@@ -300,7 +328,7 @@ class Lolly : Service() {
             if (!lolly.exists()) {
                 lolly.mkdir()
             }
-            val sdf = SimpleDateFormat("yy-MM-dd-HH:mm:ss:SSS")
+            val sdf = SimpleDateFormat("yy-MM-dd-HH:mm:ss:SSS", Locale.CHINA)
             val time = sdf.format(Calendar.getInstance().time)
             val logTxt = File(lolly, "/lolly-log-$time.txt")
             Logly.i("log Path = " + logTxt.absolutePath)
@@ -336,7 +364,7 @@ class Lolly : Service() {
         mLolly!!.setBackgroundColor(Color.BLACK)
 
         //mTerminalBar
-        mTerminalBar = LinearLayout(this)
+        mTerminalBar = TouchAbleView(this)
         lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         mTerminalBar!!.layoutParams = lp
         mTerminalBar!!.orientation = LinearLayout.HORIZONTAL
@@ -558,7 +586,7 @@ class Lolly : Service() {
         }
 
         private fun assignLog(line: String) {
-            mAllLogs!!.add(line)
+            mAllLogs.add(line)
             if (line.contains("D/")) {
                 mDebugLogs.add(line)
             }
@@ -695,7 +723,7 @@ class Lolly : Service() {
             return super.performClick()
         }
     }
-    companion object {
+    companion object{
 
         /**
          * 将Lolly窗口显示在设备屏幕上

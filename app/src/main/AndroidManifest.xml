@@ -26,18 +26,6 @@
             android:exported="false"
             android:process=":remote" />
 
-        <activity android:name="com.zqlite.android.lolly.LollyViewer">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <action android:name="android.intent.action.VIEW" />
-
-                <data android:scheme="file" />
-                <data android:scheme="content" />
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-        </activity>
-
         <service android:name=".MyTileService"
             android:label="Lolly"
             android:icon="@mipmap/ic_launcher"
