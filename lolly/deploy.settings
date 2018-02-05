@@ -1,0 +1,7 @@
+siteUrl = http://zqlite.com/
+gitUrl = https://github.com/ZhangQinglian
+version = 2.0
+groupId = com.zqlite.android
+licenses = Apache-2.0
+id = com.zqlite.android.lolly
+name = lolly
