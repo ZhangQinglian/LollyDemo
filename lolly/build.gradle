@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
+apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 27
     buildToolsVersion '26.0.2'
@@ -24,6 +26,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.zql.android:logly:1.1'
     implementation 'com.android.support:support-v4:27.0.2'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
 
 apply plugin: 'com.github.dcendents.android-maven'
@@ -103,4 +106,7 @@ bintray {
         licenses = ["Apache-2.0"]
         publish = true
     }
+}
+repositories {
+    mavenCentral()
 }

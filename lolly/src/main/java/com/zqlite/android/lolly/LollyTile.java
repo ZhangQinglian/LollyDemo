@@ -66,10 +66,10 @@ public abstract  class LollyTile extends TileService {
         Tile tile = getQsTile();
         flag = !flag;
         if(!flag){
-            Lolly.hideLolly(this);
+            Lolly.Companion.hideLolly(this);
             tile.setState(Tile.STATE_INACTIVE);
         }else {
-            Lolly.showLolly(this,getTags());
+            Lolly.Companion.showLolly(this,getTags());
             tile.setState(Tile.STATE_ACTIVE);
         }
         tile.updateTile();
