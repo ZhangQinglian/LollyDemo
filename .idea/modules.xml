@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/LollyDemo.iml" filepath="$PROJECT_DIR$/LollyDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LollyDemo.iml" filepath="$PROJECT_DIR$/LollyDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lolly/lolly.iml" filepath="$PROJECT_DIR$/lolly/lolly.iml" />
       <module fileurl="file://$PROJECT_DIR$/lolly/lolly.iml" filepath="$PROJECT_DIR$/lolly/lolly.iml" />
     </modules>
   </component>
