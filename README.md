@@ -50,7 +50,7 @@ public static void Lolly.saveLog(@NotNull android.app.Activity activity)
 
 **😆 Have fun with this function!**
 
-#License
+# License
 
      Copyright 2016 zhangqinglian
 
