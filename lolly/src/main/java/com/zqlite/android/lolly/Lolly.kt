@@ -28,6 +28,7 @@ import android.graphics.PixelFormat
 import android.os.AsyncTask
 import android.os.Environment
 import android.os.IBinder
+import android.support.v7.widget.RecyclerView
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -44,7 +45,6 @@ import android.widget.ArrayAdapter
 import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.Spinner
@@ -59,7 +59,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.text.SimpleDateFormat
@@ -101,10 +100,10 @@ class Lolly : Service() {
 
     override fun onCreate() {
         Logly.i("Lolly create ...")
-        initLuffyWindow()
+        initLollyWindow()
     }
 
-    private fun initLuffyWindow() {
+    private fun initLollyWindow() {
 
         //init the window layout params
         mWM = getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -328,23 +327,23 @@ class Lolly : Service() {
 
         //LollyContainer
         mLolly = LinearLayout(this)
-        var LP = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getDip(300))
-        mLolly!!.layoutParams = LP
+        var lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getDip(300))
+        mLolly!!.layoutParams = lp
         mLolly!!.orientation = LinearLayout.VERTICAL
         mLolly!!.visibility = View.INVISIBLE
         mLolly!!.setBackgroundColor(Color.BLACK)
 
         //mTerminalBar
         mTerminalBar = LinearLayout(this)
-        LP = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        mTerminalBar!!.layoutParams = LP
+        lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        mTerminalBar!!.layoutParams = lp
         mTerminalBar!!.orientation = LinearLayout.HORIZONTAL
         mTerminalBar!!.setBackgroundColor(Color.parseColor("#303F9F"))
 
         //mBack2EndCheckBox
-        var LPC = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        var lpc = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         mBack2EndCheckBox = CheckBox(this)
-        mBack2EndCheckBox!!.layoutParams = LPC
+        mBack2EndCheckBox!!.layoutParams = lpc
         mBack2EndCheckBox!!.text = "O"
         mBack2EndCheckBox!!.setTextColor(Color.BLACK)
         mBack2EndCheckBox!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
@@ -352,8 +351,8 @@ class Lolly : Service() {
 
         //mLogLevelSpinner
         mLogLevelSpinner = Spinner(this)
-        LPC = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        mLogLevelSpinner!!.layoutParams = LPC
+        lpc = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        mLogLevelSpinner!!.layoutParams = lpc
         val logLevel = ArrayList<String>()
         logLevel.add("V")
         logLevel.add("D")
@@ -378,8 +377,8 @@ class Lolly : Service() {
 
         //mTagsSpinner
         mTagsSpinner = Spinner(this)
-        LPC = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        mTagsSpinner!!.layoutParams = LPC
+        lpc = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        mTagsSpinner!!.layoutParams = lpc
         mTags = ArrayList()
         mTags!!.add("All")
         val tagAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, mTags!!)
@@ -398,20 +397,20 @@ class Lolly : Service() {
 
         //mOrientationBtn
         mOrientationBtn = Button(this)
-        LPC = ViewGroup.LayoutParams(getDip(40), ViewGroup.LayoutParams.WRAP_CONTENT)
-        mOrientationBtn!!.layoutParams = LPC
+        lpc = ViewGroup.LayoutParams(getDip(40), ViewGroup.LayoutParams.WRAP_CONTENT)
+        mOrientationBtn!!.layoutParams = lpc
         mOrientationBtn!!.text = "H"
 
         //mShowContainerBtn
         mShowContainerBtn = Button(this)
-        LPC = ViewGroup.LayoutParams(getDip(40), ViewGroup.LayoutParams.WRAP_CONTENT)
-        mShowContainerBtn!!.layoutParams = LPC
+        lpc = ViewGroup.LayoutParams(getDip(40), ViewGroup.LayoutParams.WRAP_CONTENT)
+        mShowContainerBtn!!.layoutParams = lpc
         mShowContainerBtn!!.text = "-"
 
         //mClearBtn
         mClearBtn = Button(this)
-        LPC = ViewGroup.LayoutParams(getDip(40), ViewGroup.LayoutParams.WRAP_CONTENT)
-        mClearBtn!!.layoutParams = LPC
+        lpc = ViewGroup.LayoutParams(getDip(40), ViewGroup.LayoutParams.WRAP_CONTENT)
+        mClearBtn!!.layoutParams = lpc
         mClearBtn!!.text = "c"
 
         //mContainer
@@ -442,7 +441,7 @@ class Lolly : Service() {
 
     class LogAdapter(private val mContext: Context) : BaseAdapter() {
 
-        private var mCurrentLogs: MutableList<String>? = null
+        private var mCurrentLogs: MutableList<String>?
         private val mAllLogs: MutableList<String>?
         private val mDebugLogs: MutableList<String>
         private val mInfoLogs: MutableList<String>
@@ -711,6 +710,257 @@ class Lolly : Service() {
 
         internal inner class LogHolder {
             var logText: TextView? = null
+        }
+    }
+
+    inner class RVLogAdapter : RecyclerView.Adapter<RVLogItemHolder>(){
+
+
+        private var mCurrentLogs: MutableList<String> = mutableListOf()
+        private val mAllLogs: MutableList<String> = mutableListOf()
+        private val mDebugLogs: MutableList<String> = mutableListOf()
+        private val mInfoLogs: MutableList<String> = mutableListOf()
+        private val mWarnLogs: MutableList<String> = mutableListOf()
+        private val mErrorLogs: MutableList<String> = mutableListOf()
+        private val mAssertLogs: MutableList<String> = mutableListOf()
+
+        private val mSystemErrorCache: MutableList<String> = mutableListOf()
+        private val mTagsLogs: MutableList<String> = mutableListOf()
+
+        private val space = "            "
+        private val lock = Any()
+        private var mCurrentLevel: String = "V"
+        private var mCurrentTag: String = "All"
+
+        private var redSpan = ForegroundColorSpan(Color.RED)
+        private var whiteSpan = ForegroundColorSpan(Color.WHITE)
+        private var blueSpan = ForegroundColorSpan(Color.BLUE)
+        private var greenSpan = ForegroundColorSpan(Color.GREEN)
+        private var yellowSpan = ForegroundColorSpan(Color.YELLOW)
+
+        private val fullTag: String
+            get() {
+                val fullTag: String
+                if ("V" == mCurrentLevel) {
+                    fullTag = "/" + mCurrentTag!!
+                } else {
+                    fullTag = mCurrentLevel + "/" + mCurrentTag
+                }
+                return fullTag
+            }
+
+        val allLog: List<String>?
+            get() = mAllLogs
+
+        init {
+            mCurrentLogs = mDebugLogs
+        }
+
+        private fun spanLine(line: String): SpannableStringBuilder {
+            val builder = SpannableStringBuilder(line)
+
+            if (line.contains("D/")) {
+                builder.setSpan(whiteSpan, 0, line.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                return builder
+            }
+            if (line.contains("System.err")) {
+                builder.setSpan(redSpan, 0, line.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                return builder
+            }
+            if (line.contains("E/")) {
+                builder.setSpan(redSpan, 0, line.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                return builder
+            }
+            if (line.contains("W/")) {
+                builder.setSpan(yellowSpan, 0, line.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                return builder
+            }
+            if (line.contains("A/")) {
+                builder.setSpan(greenSpan, 0, line.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                return builder
+            }
+            if (line.contains("I/")) {
+                builder.setSpan(blueSpan, 0, line.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                return builder
+            }
+            return builder
+        }
+
+        /**
+         * @param line
+         * @return true:更新UI，将listView滑动到最底层 false:不做处理
+         */
+        fun addOneLog(line: String): Boolean {
+
+            //对异常日志做特殊处理
+            //如果是日常日志则加入到mSystemError，不进行屏幕输出
+            if (line.contains("System.err")) {
+                if (mSystemErrorCache.size == 0) {
+                    mSystemErrorCache.add(line)
+                } else {
+                    if (line.contains("at")) {
+                        val indexAT = line.indexOf("at")
+                        mSystemErrorCache.add(line.substring(indexAT))
+                    } else {
+                        mSystemErrorCache.add(line)
+                    }
+                }
+                return false
+            }
+
+            //对正常日志做处理
+            if (mAllLogs != null) {
+                //若mSystemError内容不为空，则将其内容打印至屏幕
+                if (mSystemErrorCache.size != 0) {
+                    val sb = StringBuilder()
+                    for (i in mSystemErrorCache.indices) {
+                        if (i != 0) {
+                            sb.append(space).append(mSystemErrorCache[i]).append("\n")
+                        } else {
+                            sb.append(mSystemErrorCache[i]).append("\n")
+                        }
+                    }
+                    assignLog(sb.toString())
+                    //清空mSystemError
+                    mSystemErrorCache.clear()
+                }
+                assignLog(line)
+                return true
+            }
+
+            return false
+        }
+
+        private fun assignLog(line: String) {
+            mAllLogs!!.add(line)
+            if (line.contains("D/")) {
+                mDebugLogs.add(line)
+            }
+            if (line.contains("I/")) {
+                mInfoLogs.add(line)
+            }
+            if (line.contains("W/")) {
+                mWarnLogs.add(line)
+            }
+            if (line.contains("E/")) {
+                mErrorLogs.add(line)
+            }
+            if (line.contains("A/")) {
+                mAssertLogs.add(line)
+            }
+
+            if (line.contains("System.err")) {
+                mErrorLogs.add(line)
+            }
+
+            if (line.contains(fullTag) && mCurrentTag != "All") {
+                mTagsLogs.add(line)
+            }
+            notifyDataSetChanged()
+        }
+
+        fun changeLogLevel(level: String) {
+
+            synchronized(lock) {
+                mCurrentLevel = level
+                if ("V" == level) {
+                    mCurrentLogs = mAllLogs
+                }
+
+                if ("D" == level) {
+                    mCurrentLogs = mDebugLogs
+                }
+
+                if ("I" == level) {
+                    mCurrentLogs = mInfoLogs
+                }
+                if ("W" == level) {
+                    mCurrentLogs = mWarnLogs
+                }
+                if ("E" == level) {
+                    mCurrentLogs = mErrorLogs
+                }
+                if ("A" == level) {
+                    mCurrentLogs = mAssertLogs
+                }
+                notifyDataSetChanged()
+            }
+            if (mCurrentTag != "All") {
+                changeTags(mCurrentTag)
+            }
+
+        }
+
+        fun changeTags(tag: String) {
+            mCurrentTag = tag
+            if ("All" == mCurrentTag) {
+                changeLogLevel(mCurrentLevel)
+                mTagsLogs.clear()
+                return
+            }
+            synchronized(lock) {
+                val fullTag = fullTag
+                mCurrentLogs = getLogsByLevel(mCurrentLevel)
+                mTagsLogs.clear()
+                for (line in mCurrentLogs) {
+                    if (line.contains(fullTag)) {
+                        mTagsLogs.add(line)
+                    }
+                }
+                mCurrentLogs = mTagsLogs
+                notifyDataSetChanged()
+            }
+        }
+
+        private fun getLogsByLevel(level: String?): MutableList<String> {
+            return when (level) {
+                "V" -> mAllLogs
+                "D" -> mDebugLogs
+                "I" -> mInfoLogs
+                "W" -> mWarnLogs
+                "E" -> mErrorLogs
+                "A" -> mAssertLogs
+                else -> mAllLogs
+            }
+        }
+
+
+        fun cleanUp() {
+            mCurrentLogs.clear()
+            mAllLogs.clear()
+            mDebugLogs.clear()
+            mInfoLogs.clear()
+            mWarnLogs.clear()
+            mErrorLogs.clear()
+            mAssertLogs.clear()
+            mSystemErrorCache.clear()
+            mTagsLogs.clear()
+            notifyDataSetChanged()
+        }
+
+        override fun onBindViewHolder(holder: RVLogItemHolder?, position: Int) {
+            holder?.updateText(spanLine(mCurrentLogs[position]))
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RVLogItemHolder {
+            val textView = TextView(this@Lolly.application)
+            val lp = AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT)
+            textView.layoutParams = lp
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+            textView.setTextColor(Color.WHITE)
+            return RVLogItemHolder(textView)
+        }
+
+        override fun getItemCount(): Int {
+            synchronized(lock) {
+                return mCurrentLogs.size
+            }
+        }
+    }
+
+    class RVLogItemHolder(view:View) : RecyclerView.ViewHolder(view){
+        fun updateText(logText:CharSequence){
+            (itemView as TextView).text = logText
         }
     }
 
